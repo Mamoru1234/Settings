@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+PROJECT_PATH="$HOME/projects/riot"
+
+function startOne() {
+    cd "$PROJECT_PATH"
+    STORAGE_DIR="$PROJECT_PATH/riot-one/riot-one-server/build/install/RiotOne/data"
+    if [ -d "$STORAGE_DIR" ]; then
+        echo "Removing Storage ...";
+        rm -rf "$STORAGE_DIR";
+    fi
+    ./gradlew ":riot-one:riot-one-server:run"
+}
+
+function startNano() {
+    cd "$PROJECT_PATH"
+    STORAGE_DIR="$PROJECT_PATH/riot-nano/riot-nano-server/build/install/RiotNano/data"
+    if [ -d "$STORAGE_DIR" ]; then
+        echo "Removing Storage ...";
+        rm -rf "$STORAGE_DIR";
+    fi
+    ./gradlew ":riot-nano:riot-nano-server:run"
+}
+
+function startUI() {
+    cd "$PROJECT_PATH/riot-ui";
+    npm run $2;
+}
+
+case "$1" in
+    "one") startOne $*;;
+    "nano") startNano $*;;
+    "ui") startUI $*;;
+    *)echo "Unknown command";;
+esac
