@@ -7,7 +7,7 @@ import React, { Component, PropTypes } from 'react';
 import PureRender from 'pure-render-decorator';
 import {connect} from 'react-redux';
 
-import $COMPONENT_NAME_VIEW from './$COMPONENT_NAME_VIEW;
+import $COMPONENT_NAME_VIEW from './$COMPONENT_NAME_VIEW';
 
 const mapDispatchToProps = {
 };
@@ -38,11 +38,13 @@ cat >> "$COMPONENT_NAME_VIEW.js" << EOF
 import React, { Component, PropTypes } from 'react';
 import PureRender from 'pure-render-decorator';
 
+import styles from './$COMPONENT_NAME.scss';
+
 @PureRender
 export default class $COMPONENT_NAME_VIEW extends Component {
   render () {
     return (
-      <div></div>
+      <div className={styles.view}></div>
     );
   }
 }
