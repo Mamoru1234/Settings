@@ -2,6 +2,12 @@
 
 COMPONENT_NAME=`basename $PWD`;
 COMPONENT_NAME_VIEW=$COMPONENT_NAME"View";
+cat >> 'index.js'<< EOF
+import $COMPONENT_NAME from './$COMPONENT_NAME';
+
+export default $COMPONENT_NAME;
+
+EOF
 cat >> "$COMPONENT_NAME.js"<<EOF
 import React, { Component, PropTypes } from 'react';
 import PureRender from 'pure-render-decorator';
