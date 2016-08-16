@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 PROJECT_PATH="$HOME/projects/riot"
-NODE_IMAGE_NAME='riotdocker.predixionsoftware.com:5000/riot-one';
+NODE_NAME='one';
+NODE_IMAGE_NAME="riotdocker.predixionsoftware.com:5000/riot-$NODE_NAME"
 
 #using SIGNTERM instead of kill
 function saveRemoveContainer() {
@@ -21,6 +22,8 @@ function setup () {
 #    removes existing containers related to cassandra
 #    removeImageByFilter "riotdocker.predixionsoftware.com:5000/cassandra";
 #    removeImageByFilter "cassandra";
+#    kafka
+#    removeImageByFilter "nginate/kafka-docker-bundle:0.10";
     saveRemoveContainer "kafka";
     docker run -d --name=kafka --net=host -e LEADER_REBALANCE_CHECK_INTERVAL=1 nginate/kafka-docker-bundle:0.10;
 #   build cassandra image
@@ -32,9 +35,9 @@ function setup () {
 }
 # updates docker images
 function update () {
-    removeImageByFilter "riotdocker.predixionsoftware.com:5000/riot-one"
+    removeImageByFilter "$NODE_IMAGE_NAME"
     cd $PROJECT_PATH
-    ./gradlew ':riot-one:riot-one-server:buildDockerImage'
+    ./gradlew ":riot-$NODE_NAME:riot-$NODE_NAME-server:buildDockerImage"
 }
 
 function runNode() {
