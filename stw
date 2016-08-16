@@ -22,6 +22,16 @@ function startNano() {
     ./gradlew ":riot-nano:riot-nano-server:run"
 }
 
+function startCloud() {
+    cd "$PROJECT_PATH"
+    STORAGE_DIR="$PROJECT_PATH/riot-cloud/riot-cloud-server/build/install/RiotNano/data"
+    if [ -d "$STORAGE_DIR" ]; then
+        echo "Removing Storage ...";
+        rm -rf "$STORAGE_DIR";
+    fi
+    ./gradlew ":riot-cloud:riot-cloud-server:run"
+}
+
 function startUI() {
     cd "$PROJECT_PATH/riot-ui";
     npm run $2;
@@ -31,5 +41,6 @@ case "$1" in
     "one") startOne $*;;
     "nano") startNano $*;;
     "ui") startUI $*;;
+    "cloud") startCloud $*;;
     *)echo "Unknown command";;
 esac
