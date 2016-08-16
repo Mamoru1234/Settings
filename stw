@@ -24,7 +24,7 @@ function startNano() {
 
 function startCloud() {
     cd "$PROJECT_PATH"
-    STORAGE_DIR="$PROJECT_PATH/riot-cloud/riot-cloud-server/build/install/RiotNano/data"
+    STORAGE_DIR="$PROJECT_PATH/riot-cloud/riot-cloud-server/build/install/RiotCloud/data"
     if [ -d "$STORAGE_DIR" ]; then
         echo "Removing Storage ...";
         rm -rf "$STORAGE_DIR";
