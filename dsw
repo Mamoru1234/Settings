@@ -1,8 +1,18 @@
 #!/usr/bin/env bash
 
 PROJECT_PATH="$HOME/projects/riot"
-NODE_NAME='one';
-NODE_IMAGE_NAME="riotdocker.predixionsoftware.com:5000/riot-$NODE_NAME"
+
+NODE_TYPE='one';
+
+CLOUD_NAME="riot-cloud";
+CLOUD_HOST_NAME="riot-cloud-host";
+CLOUD_PORT=8080;
+
+KAFKA_NAME="kafka";
+KAFKA_HOST_NAME="kafka-host";
+KAFKA_PORT=9042;
+ZOOKEEPER_PORT=2181;
+
 
 #using SIGNTERM instead of kill
 function saveRemoveContainer() {
@@ -24,33 +34,79 @@ function setup () {
 #    removeImageByFilter "cassandra";
 #    kafka
 #    removeImageByFilter "nginate/kafka-docker-bundle:0.10";
-    saveRemoveContainer "kafka";
-    docker run -d --name=kafka --net=host -e LEADER_REBALANCE_CHECK_INTERVAL=1 nginate/kafka-docker-bundle:0.10;
+    saveRemoveContainer "$KAFKA_NAME";
+    docker run -d \
+     --name="$KAFKA_NAME" \
+     -p "$ZOOKEEPER_PORT":2181 -p "$KAFKA_PORT":9092 \
+     -e LEADER_REBALANCE_CHECK_INTERVAL=1 \
+     -h "$KAFKA_HOST_NAME" \
+     nginate/kafka-docker-bundle:0.10;
 #   build cassandra image
 #    cd $PROJECT_PATH;
 #    ./gradlew ':docker:cassandra:buildDockerImage'
     saveRemoveContainer "cassandra";
     IMAGE_ID=$(findImageId 'riotdocker.predixionsoftware.com:5000/cassandra');
-    docker run -d --name=cassandra --net=host $IMAGE_ID
+    docker run -d \
+     --name=cassandra \
+     -e JVM_OPTS="-Xmx512m -Xms128m" \
+     --net=host $IMAGE_ID;
 }
 # updates docker images
 function update () {
+    NODE_IMAGE_NAME="riotdocker.predixionsoftware.com:5000/riot-$1";
     removeImageByFilter "$NODE_IMAGE_NAME"
-    cd $PROJECT_PATH
-    ./gradlew ":riot-$NODE_NAME:riot-$NODE_NAME-server:buildDockerImage"
+    cd "$PROJECT_PATH"
+    ./gradlew ":riot-$1:riot-$1-server:buildDockerImage"
 }
 
 function runNode() {
+    echo "starting Node.."
+    NODE_IMAGE_NAME="riotdocker.predixionsoftware.com:5000/riot-$NODE_TYPE";
+    echo "$NODE_IMAGE_NAME"
     IMAGE_ID=$(findImageId "$NODE_IMAGE_NAME");
-    NODE_ID=$(docker create -p "$1:8080" $IMAGE_ID);
+    echo "$IMAGE_ID"
+    NODE_ID=$(docker create \
+        -p "$1:8080" \
+        --link="$CLOUD_NAME":"$CLOUD_HOST_NAME" \
+        --link="$KAFKA_NAME":"$KAFKA_HOST_NAME" \
+        -e RIOT_CLOUD_HOST="$CLOUD_HOST_NAME" \
+        -e RIOT_CLOUD_PORT="$CLOUD_PORT" \
+        "$IMAGE_ID");
     docker start "$NODE_ID"
     docker attach "$NODE_ID"
     docker rm "$NODE_ID"
 }
 
+function runCloud() {
+    echo "running cloud";
+    IMAGE_ID=$(findImageId "riotdocker.predixionsoftware.com:5000/riot-cloud");
+    docker create \
+     --name="$CLOUD_NAME" \
+     -h "$CLOUD_HOST_NAME"\
+     --link="$KAFKA_NAME":"$KAFKA_HOST_NAME" \
+     -e CLOUD_PUBLIC_HOST="$CLOUD_HOST_NAME" \
+     -e CLOUD_PUBLIC_PORT="$CLOUD_PORT" \
+     -e CLOUD_KAFKA_BROKERS="$KAFKA_HOST_NAME":"$KAFKA_PORT" \
+     -e CLOUD_ZOOKEEPERS="$KAFKA_HOST_NAME":"$ZOOKEEPER_PORT" \
+     -p "$CLOUD_PORT:8080" "$IMAGE_ID";
+    docker start "$CLOUD_NAME"
+    docker attach "$CLOUD_NAME"
+    docker rm "$CLOUD_NAME"
+}
+
+function manageRun() {
+    NODE_PORT="$1"
+    if [ $NODE_PORT -eq "$CLOUD_PORT" ]
+     then
+         echo "running cloud";
+        runCloud;
+     else
+        runNode $NODE_PORT;
+    fi
+}
 case "$1" in
     "setup") setup;;
-    "upd") update;;
-    "run") runNode $2;;
+    "upd") update $2;;
+    "run") manageRun $2;;
     *)echo "Unknown command";;
 esac
