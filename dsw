@@ -69,8 +69,6 @@ function runNode() {
         -p "$1:8080" \
         --link="$CLOUD_NAME":"$CLOUD_HOST_NAME" \
         --link="$KAFKA_NAME":"$KAFKA_HOST_NAME" \
-        -e RIOT_CLOUD_HOST="$CLOUD_HOST_NAME" \
-        -e RIOT_CLOUD_PORT="$CLOUD_PORT" \
         "$IMAGE_ID");
     docker start "$NODE_ID"
     docker attach "$NODE_ID"
