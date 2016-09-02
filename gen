@@ -3,9 +3,7 @@
 COMPONENT_NAME=`basename $PWD`;
 COMPONENT_NAME_VIEW=$COMPONENT_NAME"View";
 cat >> 'index.js'<< EOF
-import $COMPONENT_NAME from './$COMPONENT_NAME';
-
-export default $COMPONENT_NAME;
+export {$COMPONENT_NAME} from './$COMPONENT_NAME';
 
 EOF
 cat >> "$COMPONENT_NAME.js"<<EOF
@@ -13,7 +11,7 @@ import React, { Component, PropTypes } from 'react';
 import PureRender from 'pure-render-decorator';
 import {connect} from 'react-redux';
 
-import $COMPONENT_NAME_VIEW from './$COMPONENT_NAME_VIEW';
+import {$COMPONENT_NAME_VIEW} from './$COMPONENT_NAME_VIEW';
 
 const mapDispatchToProps = {
 };
@@ -24,7 +22,7 @@ function mapStateToProps(state) {
 
 @connect(mapStateToProps, mapDispatchToProps)
 @PureRender
-export default class $COMPONENT_NAME extends Component {
+export class $COMPONENT_NAME extends Component {
   render () {
     return (
       <$COMPONENT_NAME_VIEW/>
@@ -47,7 +45,7 @@ import PureRender from 'pure-render-decorator';
 import styles from './$COMPONENT_NAME.scss';
 
 @PureRender
-export default class $COMPONENT_NAME_VIEW extends Component {
+export class $COMPONENT_NAME_VIEW extends Component {
   render () {
     return (
       <div className={styles.view}></div>
