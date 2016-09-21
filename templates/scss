@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+
+function scss() {
+    cat >> "$1.scss" << EOF
+.view{}
+
+EOF
+}

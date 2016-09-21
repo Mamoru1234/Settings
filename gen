@@ -1,56 +1,30 @@
 #!/usr/bin/env bash
 
 COMPONENT_NAME=`basename $PWD`;
-COMPONENT_NAME_VIEW=$COMPONENT_NAME"View";
-cat >> 'index.js'<< EOF
-export {$COMPONENT_NAME} from './$COMPONENT_NAME';
+. ~/bin/templates/smart
+. ~/bin/templates/index
+. ~/bin/templates/dump
+. ~/bin/templates/scss
+CV=$COMPONENT_NAME"View"
 
-EOF
-cat >> "$COMPONENT_NAME.js"<<EOF
-import React, { Component, PropTypes } from 'react';
-import PureRender from 'pure-render-decorator';
-import {connect} from 'react-redux';
-
-import {$COMPONENT_NAME_VIEW} from './$COMPONENT_NAME_VIEW';
-
-const mapDispatchToProps = {
-};
-
-function mapStateToProps(state) {
-  return {};
-}
-
-@connect(mapStateToProps, mapDispatchToProps)
-@PureRender
-export class $COMPONENT_NAME extends Component {
-  render () {
-    return (
-      <$COMPONENT_NAME_VIEW/>
-    );
-  }
-}
-
-EOF
-
-cat >> "$COMPONENT_NAME.scss" << EOF
-.view{
-}
-
-EOF
-
-cat >> "$COMPONENT_NAME_VIEW.js" << EOF
-import React, { Component, PropTypes } from 'react';
-import PureRender from 'pure-render-decorator';
-
-import styles from './$COMPONENT_NAME.scss';
-
-@PureRender
-export class $COMPONENT_NAME_VIEW extends Component {
-  render () {
-    return (
-      <div className={styles.view}></div>
-    );
-  }
-}
-
-EOF
+case "$1" in
+#smart component
+    "s")
+        index $COMPONENT_NAME
+        dump $CV
+        smart $COMPONENT_NAME $CV
+        scss $COMPONENT_NAME
+    ;;
+# dump component
+    "d")
+        index $COMPONENT_NAME
+        dump $COMPONENT_NAME
+    ;;
+#dump component with styles
+    "ds")
+        index $COMPONENT_NAME
+        dump $COMPONENT_NAME
+        scss $COMPONENT_NAME
+    ;;
+    *) echo "unknown command";;
+esac
