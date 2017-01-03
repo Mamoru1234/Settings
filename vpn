@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+openvpn --config ~/vpn/gws-irvine.ovpn --up /etc/openvpn/update-resolv-conf --down /etc/openvpn/update-resolv-conf --script-security 2
