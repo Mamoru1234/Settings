@@ -3,17 +3,18 @@
 PROJECT_PATH="$HOME/projects/riot"
 
 NODE_TYPE='one';
+IMAGE_NAME="riotdocker.predixionsoftware.com:5000/greenwave/axon-riot-$NODE_TYPE:1.3.0-SNAPSHOT";
+
+RIOT_CLOUD_HOST='riotcloud.predixionsoftware.com'
+
+# Maksym
+# RIOT_CLOUD_HOST='10.2.2.164'
 
 CLOUD_NAME="riot-cloud";
 CLOUD_HOST_NAME="riot-cloud-host";
 CLOUD_PORT=8080;
 
-KAFKA_NAME="kafka";
-KAFKA_HOST_NAME="kafka-host";
-KAFKA_PORT=9092;
-ZOOKEEPER_PORT=2181;
-
-
+# docker run -d --name riot-one -p 8080:4040 -p 5000:5000 -e RIOT_GATEWAY_NAME=Alexei -e RIOT_CLOUD_HOST=riotcloud.predixionsoftware.com riotdocker.predixionsoftware.com:5000/greenwave/axon-riot-one:1.3.0-SNAPSHOT
 #using SIGNTERM instead of kill
 function saveRemoveContainer() {
     docker stop $1;
@@ -54,22 +55,18 @@ function setup () {
 # updates docker images
 function update () {
     NODE_IMAGE_NAME="riotdocker.predixionsoftware.com:5000/riot-$1";
-    removeImageByFilter "$NODE_IMAGE_NAME"
+    removeImageByFilter "$IMAGE_NAME"
     cd "$PROJECT_PATH"
     ./gradlew ":riot-$1:riot-$1-server:buildDockerImage"
 }
 
 function runNode() {
-    echo "starting Node.."
     NODE_IMAGE_NAME="riotdocker.predixionsoftware.com:5000/riot-$NODE_TYPE";
-    echo "$NODE_IMAGE_NAME"
-    IMAGE_ID=$(findImageId "$NODE_IMAGE_NAME");
-    echo "$IMAGE_ID"
     NODE_ID=$(docker create \
-        -p "$1:8080" \
-        --link="$CLOUD_NAME":"$CLOUD_HOST_NAME" \
-        --link="$KAFKA_NAME":"$KAFKA_HOST_NAME" \
-        "$IMAGE_ID");
+     --name $1 -p $2:8080 \
+      -e RIOT_GATEWAY_NAME=$1 -e RIOT_CLOUD_HOST=$RIOT_CLOUD_HOST -e RIOT_CLOUD_PORT=8081\
+        $IMAGE_NAME);
+
     docker start "$NODE_ID"
     docker attach "$NODE_ID"
     docker rm "$NODE_ID"
@@ -92,19 +89,9 @@ function runCloud() {
     docker rm "$CLOUD_NAME"
 }
 
-function manageRun() {
-    NODE_PORT="$1"
-    if [ $NODE_PORT -eq "$CLOUD_PORT" ]
-     then
-         echo "running cloud";
-        runCloud;
-     else
-        runNode $NODE_PORT;
-    fi
-}
 case "$1" in
     "setup") setup;;
     "upd") update $2;;
-    "run") manageRun $2;;
+    "run") runNode $2 $3;;
     *)echo "Unknown command";;
 esac
