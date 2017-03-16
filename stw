@@ -3,33 +3,17 @@
 PROJECT_PATH="$HOME/projects/riot"
 
 function startOne() {
-    cd "$PROJECT_PATH"
-    STORAGE_DIR="$PROJECT_PATH/riot-one/riot-one-server/build/install/RiotOne/data"
-    if [ -d "$STORAGE_DIR" ]; then
-        echo "Removing Storage ...";
-        rm -rf "$STORAGE_DIR";
-    fi
-    ./gradlew ":riot-one:riot-one-server:run"
-}
-
-function startNano() {
-    cd "$PROJECT_PATH"
-    STORAGE_DIR="$PROJECT_PATH/riot-nano/riot-nano-server/build/install/RiotNano/data"
-    if [ -d "$STORAGE_DIR" ]; then
-        echo "Removing Storage ...";
-        rm -rf "$STORAGE_DIR";
-    fi
-    ./gradlew ":riot-nano:riot-nano-server:run"
+    CONTAINER_ID=$(docker create -p 8080:8080 registry.greenwavereality.com/axon/axon-riot-one:1.3.0-SNAPSHOT)
+    docker start $CONTAINER_ID
+    docker attach $CONTAINER_ID
+    docker rm $CONTAINER_ID
 }
 
 function startCloud() {
-    cd "$PROJECT_PATH"
-    STORAGE_DIR="$PROJECT_PATH/riot-cloud/riot-cloud-server/build/install/RiotCloud/data"
-    if [ -d "$STORAGE_DIR" ]; then
-        echo "Removing Storage ...";
-        rm -rf "$STORAGE_DIR";
-    fi
-    ./gradlew ":riot-cloud:riot-cloud-server:run"
+    CONTAINER_ID=$(docker create -p 8080:8080 registry.greenwavereality.com/axon/axon-riot-cloud:2.0.0-SNAPSHOT)
+    docker start $CONTAINER_ID
+    docker attach $CONTAINER_ID
+    docker rm $CONTAINER_ID
 }
 
 function startUI() {
@@ -39,7 +23,6 @@ function startUI() {
 
 case "$1" in
     "one") startOne $*;;
-    "nano") startNano $*;;
     "ui") startUI $*;;
     "cloud") startCloud $*;;
     *)echo "Unknown command";;

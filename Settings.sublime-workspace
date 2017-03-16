@@ -1,0 +1,422 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"ro",
+				"row_count"
+			],
+			[
+				"s",
+				"step_number"
+			],
+			[
+				"t",
+				"transformation"
+			],
+			[
+				"re",
+				"reset_value"
+			],
+			[
+				"va",
+				"value"
+			],
+			[
+				"r",
+				"random"
+			],
+			[
+				"de",
+				"def\tFunction"
+			],
+			[
+				"se",
+				"self"
+			],
+			[
+				"device",
+				"device_name"
+			],
+			[
+				"st",
+				"step_number"
+			],
+			[
+				"in",
+				"initial_value"
+			],
+			[
+				"val",
+				"value"
+			],
+			[
+				"ra",
+				"range"
+			],
+			[
+				"am",
+				"amplitude"
+			],
+			[
+				"F",
+				"F1"
+			],
+			[
+				"p",
+				"pi"
+			],
+			[
+				"mq",
+				"mqttc"
+			],
+			[
+				"e",
+				"equal_gen"
+			],
+			[
+				"cos",
+				"cos_gen"
+			],
+			[
+				"da",
+				"data_delay"
+			],
+			[
+				"int",
+				"init_time"
+			],
+			[
+				"ge",
+				"generators"
+			],
+			[
+				"di",
+				"diff_arc"
+			],
+			[
+				"gen",
+				"generators"
+			],
+			[
+				"dif",
+				"diff_gen"
+			],
+			[
+				"def",
+				"def\tFunction"
+			],
+			[
+				"c",
+				"cos"
+			],
+			[
+				"data",
+				"data_gen"
+			],
+			[
+				"RIOT",
+				"RIOT_CLOUD_HOST"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"build_system_choices":
+	[
+	],
+	"build_varint": "",
+	"command_palette":
+	{
+		"height": 392.0,
+		"last_filter": "git sta",
+		"selected_items":
+		[
+			[
+				"git sta",
+				"Git: Stash Pop"
+			],
+			[
+				"git re",
+				"Git: Reset (hard) HEAD"
+			],
+			[
+				"gits",
+				"Git: Status"
+			],
+			[
+				"fu",
+				"FuzzyFilePath: Show current settings"
+			],
+			[
+				"list",
+				"Package Control: List Packages"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"git s",
+				"Git: Status"
+			],
+			[
+				"git res",
+				"Git: Reset (hard) HEAD"
+			],
+			[
+				"git ad",
+				"Git: Add All"
+			],
+			[
+				"git",
+				"Git: Graph All"
+			],
+			[
+				"sta",
+				"Git: Status"
+			],
+			[
+				"insa",
+				"Package Control: Install Package"
+			],
+			[
+				"rem",
+				"Package Control: Remove Package"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"sublime",
+				"SublimeLinter: Choose Lint Mode"
+			],
+			[
+				"remov",
+				"Package Control: Remove Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"Pa",
+				"Package Control: List Packages"
+			]
+		],
+		"width": 467.0
+	},
+	"console":
+	{
+		"height": 126.0,
+		"history":
+		[
+			"ls",
+			"import urllib.request,os,hashlib; h = 'df21e130d211cfc94d9b0905775a7c0f' + '1e3d39e33b79698005270310898eea76'; pf = 'Package Control.sublime-package'; ipp = sublime.installed_packages_path(); urllib.request.install_opener( urllib.request.build_opener( urllib.request.ProxyHandler()) ); by = urllib.request.urlopen( 'http://packagecontrol.io/' + pf.replace(' ', '%20')).read(); dh = hashlib.sha256(by).hexdigest(); print('Error validating download (got %s instead of %s), please try manual install' % (dh, h)) if dh != h else open(os.path.join( ipp, pf), 'wb' ).write(by)"
+		]
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"expanded_folders":
+	[
+		"/home/alexei/projects/Settings"
+	],
+	"file_history":
+	[
+		"/home/alexei/Downloads/ExploreMultiSeriesChart_with_refactoring.patch",
+		"/home/alexei/projects/Settings/stw",
+		"/home/alexei/projects/python-sandbox/src/mqtt-client.py",
+		"/home/alexei/projects/python-sandbox/comments.txt",
+		"/home/alexei/projects/python-sandbox/src/nmap-test.py",
+		"/home/alexei/temp/crsf/Intranet.html",
+		"/home/alexei/temp/crsf/Intranet_files/saved_resource.html",
+		"/home/alexei/Downloads/0001-ExploreMultiSeriesChart-initial-realisation.patch",
+		"/home/alexei/temp/crsf/Intranet_files/spip.php",
+		"/home/alexei/projects/python-sandbox/src/XSS.py",
+		"/home/alexei/projects/python-sandbox/src/csv_generator.py",
+		"/home/alexei/projects/python-sandbox/src/mqtt-receiver.py",
+		"/home/alexei/projects/python-sandbox/src/data_sets/data.csv",
+		"/home/alexei/projects/python-sandbox/src/generators.py",
+		"/home/alexei/projects/python-sandbox/src/transformations.py",
+		"/home/alexei/projects/test/src/csv_generator.py",
+		"/home/alexei/projects/python-sandbox/sandbox.sublime-project",
+		"/home/alexei/projects/python-sandbox.ікс/transformations.py",
+		"/home/alexei/projects/Settings/dsw",
+		"/home/alexei/projects/python-sandbox/src/test.py",
+		"/home/alexei/projects/python-sandbox/envsetup",
+		"/home/alexei/questions.txt",
+		"/home/alexei/projects/Settings/vpn",
+		"/home/alexei/projects/riot/riot.sublime-project",
+		"/home/alexei/projects/riot/.gitignore"
+	],
+	"find":
+	{
+		"height": 23.0
+	},
+	"find_in_files":
+	{
+		"height": 90.0,
+		"where_history":
+		[
+			""
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"ExploreMultiSeriesChartUtils",
+			"utils",
+			"MenuContent",
+			"init_time",
+			"timestamp",
+			"noise_transform",
+			"sin_gen",
+			"F1",
+			"F1234",
+			"'\n"
+		],
+		"highlight": true,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 23.0
+	},
+	"input":
+	{
+		"height": 31.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.find_results":
+	{
+		"height": 0.0
+	},
+	"output.git":
+	{
+		"height": 100.0
+	},
+	"pinned_build_system": "",
+	"project": "Settings.sublime-project",
+	"replace":
+	{
+		"height": 42.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				".es",
+				"riot-ui/.eslintrc"
+			],
+			[
+				"ad",
+				"riot-ui/src/pages/Admin/Admin.js"
+			],
+			[
+				"app",
+				"riot-ui/src/containers/App.js"
+			],
+			[
+				".scs",
+				"riot-ui/src/containers/App.scss"
+			]
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 500.0,
+		"last_filter": "",
+		"selected_items":
+		[
+			[
+				"",
+				"~/projects/python-sandbox/sandbox.sublime-project"
+			]
+		],
+		"width": 380.0
+	},
+	"select_symbol":
+	{
+		"height": 0.0,
+		"last_filter": "",
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"selected_group": 0,
+	"settings":
+	{
+	},
+	"show_minimap": true,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 254.0,
+	"status_bar_visible": true,
+	"template_settings":
+	{
+	}
+}

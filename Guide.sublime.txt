@@ -2,3 +2,6 @@ https://packagecontrol.io/installation#st3 - Package Control
 Babel plugin
 SublimeLinter also with SublimeLinter ESLINT
 SideBarEnchancements
+FuzziFile
+Git
+GitGutter
