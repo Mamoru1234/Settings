@@ -2,25 +2,31 @@
 
 PROJECT_PATH="$HOME/projects/riot"
 
-# docker-compose -p riot-cloud -f docker-compose/riot-cloud-env.yml up -d
-function startOne() {
-    CONTAINER_ID=$(docker create \
-        -p 8080:8080 -v ~/temp/config/extensionsConfig.js:/usr/local/riot-one/config/extensionsConfig.js \
-        --link mqtt:mqtt \
-        registry.greenwavereality.com/axon/axon-riot-one:1.3.0-SNAPSHOT)
-    # CONTAINER_ID=$(docker create \
-    #     -p 8080:8080 \
-    #     registry.greenwavereality.com/axon/axon-riot-one:1.3.0-SNAPSHOT)
+function saveDockerStart() {
+    CONTAINER_ID=$1
     docker start $CONTAINER_ID
     docker attach $CONTAINER_ID
     docker rm $CONTAINER_ID
 }
 
+# docker-compose -p riot-cloud -f docker-compose/riot-cloud-env.yml up -d
+function startOne() {
+    # CONTAINER_ID=$(docker create \
+    #     -p 8080:8080 -v ~/temp/config/extensionsConfig.js:/usr/local/riot-one/config/extensionsConfig.js \
+    #     --link mqtt:mqtt \
+    #     registry.greenwavereality.com/axon/axon-riot-one:1.3.0-SNAPSHOT)
+    CONTAINER_ID=$(docker create \
+        -p 8080:8080 \
+        registry.greenwavereality.com/axon/axon-riot-one:1.3.0-SNAPSHOT)
+    saveDockerStart $CONTAINER_ID
+}
+
 function startCloud() {
-    CONTAINER_ID=$(docker create -p 8080:8080 registry.greenwavereality.com/axon/axon-riot-cloud:2.0.0-SNAPSHOT)
-    docker start $CONTAINER_ID
-    docker attach $CONTAINER_ID
-    docker rm $CONTAINER_ID
+    CONTAINER_ID=$(docker create \
+        -p 8080:8080 \
+        --net=riotcloud_default \
+        registry.greenwavereality.com/axon/axon-riot-cloud:2.0.0-SNAPSHOT)
+    saveDockerStart $CONTAINER_ID
 }
 
 function startUI() {
@@ -30,9 +36,16 @@ function startUI() {
 
 function startMqtt() {
     CONTAINER_ID=$(docker create -p 1883:1883 --name mqtt toke/mosquitto)
-    docker start $CONTAINER_ID
-    docker attach $CONTAINER_ID
-    docker rm $CONTAINER_ID
+    saveDockerStart $CONTAINER_ID
+}
+
+function startEnv() {
+    cd $PROJECT_PATH
+    case $1 in
+        "start") docker-compose -p riot-cloud -f docker-compose/riot-cloud-env.yml up -d;;
+        "down") docker-compose -p riot-cloud -f docker-compose/riot-cloud-env.yml down;;
+        *) echo "Unknown command";;
+    esac
 }
 
 case "$1" in
@@ -40,5 +53,6 @@ case "$1" in
     "ui") startUI $*;;
     "cloud") startCloud $*;;
     "mqtt") startMqtt $*;;
-    *)echo "Unknown command";;
+    "env") startEnv $2;;
+    *) echo "Unknown command";;
 esac
