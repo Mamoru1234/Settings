@@ -22,11 +22,14 @@ function startOne() {
 }
 
 function startCloud() {
-    CONTAINER_ID=$(docker create \
-        -p 8080:8080 \
-        --net=riotcloud_default \
-        registry.greenwavereality.com/axon/axon-riot-cloud:2.0.0-SNAPSHOT)
-    saveDockerStart $CONTAINER_ID
+    cd $PROJECT_PATH
+    ./gradlew startCloudEnv
+    sleep 1m
+    ./gradlew keycloakCreateClient flywayMigrate
+    sleep 5
+    ./gradlew -Dspring.profiles.active=dev :riot-cloud:bootRun
+    ./gradlew removeCloudEnv
+    exit
 }
 
 function startUI() {
@@ -47,15 +50,17 @@ function startEnv() {
         *) echo "Unknown command";;
     esac
 }
-
+function update() {
+    cp ~/projects/Settings/stw $(which stw)
+    exit
+}
 case "$1" in
     "one") startOne $*;;
     "ui") startUI $*;;
     "cloud") startCloud $*;;
     "mqtt") startMqtt $*;;
     "env") startEnv $2;;
+    "update") update
+    ;;
     *) echo "Unknown command";;
 esac
-
-startEnv
-startMqtt startOne
