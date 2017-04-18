@@ -11,13 +11,13 @@ function saveDockerStart() {
 
 # docker-compose -p riot-cloud -f docker-compose/riot-cloud-env.yml up -d
 function startOne() {
-    CONTAINER_ID=$(docker create \
-        -p 8080:8080 -v ~/temp/config/extensionsConfig.js:/usr/local/riot-one/config/extensionsConfig.js \
-        --link mqtt:mqtt \
-        registry.greenwavereality.com/axon/axon-riot-one:1.3.0-SNAPSHOT)
     # CONTAINER_ID=$(docker create \
-    #     -p 8080:8080 \
+    #     -p 8080:8080 -v ~/temp/config/extensionsConfig.js:/usr/local/riot-one/config/extensionsConfig.js \
+    #     --link mqtt:mqtt \
     #     registry.greenwavereality.com/axon/axon-riot-one:1.3.0-SNAPSHOT)
+    CONTAINER_ID=$(docker create \
+        -p 8080:8080 \
+        registry.greenwavereality.com/axon/axon-riot-one:1.3.0-SNAPSHOT)
     saveDockerStart $CONTAINER_ID
 }
 
@@ -27,6 +27,8 @@ function startCloud() {
     sleep 1m
     ./gradlew keycloakCreateClient flywayMigrate
     sleep 5
+    # TEMPORARY
+    node ~/projects/emulator/temp/Insert.js
     ./gradlew -Dspring.profiles.active=dev :riot-cloud:bootRun
     ./gradlew removeCloudEnv
     exit
@@ -49,10 +51,6 @@ function startEnv() {
         "down") docker-compose -p riot-cloud -f docker-compose/riot-cloud-env.yml down;;
         *) echo "Unknown command";;
     esac
-}
-function update() {
-    cp ~/projects/Settings/stw $(which stw)
-    exit
 }
 case "$1" in
     "one") startOne $*;;
