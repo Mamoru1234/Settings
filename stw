@@ -8,7 +8,7 @@ function saveDockerStart() {
     docker attach $CONTAINER_ID
     docker rm $CONTAINER_ID
 }
-
+# find . -type d -name ".gradle" | xargs rm -rf
 # docker-compose -p riot-cloud -f docker-compose/riot-cloud-env.yml up -d
 function startOne() {
     # CONTAINER_ID=$(docker create \
@@ -23,15 +23,9 @@ function startOne() {
 
 function startCloud() {
     cd $PROJECT_PATH
-    ./gradlew startCloudEnv
-    sleep 1m
-    ./gradlew keycloakCreateClient flywayMigrate
-    sleep 5
-    # TEMPORARY
-    node ~/projects/emulator/temp/Insert.js
-    ./gradlew -Dspring.profiles.active=dev :riot-cloud:bootRun
-    ./gradlew removeCloudEnv
-    exit
+    ./gradlew :riot-cloud:removeCloudCluster --no-daemon
+    ./gradlew :riot-cloud:startCloudCluster --no-daemon
+    stw ui dev:no-debug
 }
 
 function startUI() {
@@ -58,7 +52,6 @@ case "$1" in
     "cloud") startCloud $*;;
     "mqtt") startMqtt $*;;
     "env") startEnv $2;;
-    "update") update
-    ;;
+    "path") cd $PROJECT_PATH;;
     *) echo "Unknown command";;
 esac
