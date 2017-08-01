@@ -8,8 +8,9 @@ import argparse
 import shutil
 
 PROJECT_PATH = os.environ['HOME'] + '/projects/riot'
-COMPOSE_PATH = os.environ['HOME'] + '/temp/compose.yml'
-PS_PATH = os.environ['HOME'] + '/temp/postgres-scripts'
+DEST_DIR = '/temp'
+COMPOSE_PATH = os.environ['HOME'] + DEST_DIR + '/compose.yml'
+PS_PATH = os.environ['HOME'] + DEST_DIR + '/postgres-scripts'
 
 def project_call(command):
     return subprocess.call(command, shell = True, cwd = PROJECT_PATH)
