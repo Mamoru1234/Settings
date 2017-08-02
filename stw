@@ -73,15 +73,18 @@ parser.add_argument('--remove', action = 'store_true', default = False)
 parser.add_argument('--pull', action = 'store_true', default = False)
 args = parser.parse_args()
 
-if (args.start):
-    start_cloud()
-elif (args.remove):
-    remove_cloud()
-elif (args.prepare):
-    prepare()
-elif (args.pull):
-    pull_cloud()
-elif (not args.ui == None):
-    command = 'npm run ' + args.ui
-    print command
-    subprocess.call(command, shell = True, cwd = PROJECT_PATH + '/riot-ui')
+try:
+    if (args.start):
+        start_cloud()
+    elif (args.remove):
+        remove_cloud()
+    elif (args.prepare):
+        prepare()
+    elif (args.pull):
+        pull_cloud()
+    elif (not args.ui == None):
+        command = 'npm run ' + args.ui
+        print command
+        subprocess.call(command, shell = True, cwd = PROJECT_PATH + '/riot-ui')
+except:
+    pass
