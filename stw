@@ -68,7 +68,7 @@ def pull_cloud():
 parser = argparse.ArgumentParser()
 parser.add_argument('--start', action = 'store_true', default = False)
 parser.add_argument('--prepare', action = 'store_true', default = False)
-parser.add_argument('--ui', action = 'store', default = False)
+parser.add_argument('--ui', action = 'store')
 parser.add_argument('--remove', action = 'store_true', default = False)
 parser.add_argument('--pull', action = 'store_true', default = False)
 args = parser.parse_args()
