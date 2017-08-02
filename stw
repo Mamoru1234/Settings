@@ -8,11 +8,13 @@ import argparse
 import shutil
 
 PROJECT_PATH = os.environ['HOME'] + '/projects/riot'
-DEST_DIR = '/temp'
-COMPOSE_PATH = os.environ['HOME'] + DEST_DIR + '/compose.yml'
-PS_PATH = os.environ['HOME'] + DEST_DIR + '/postgres-scripts'
+DEST_DIR = os.environ['HOME'] + '/temp'
+COMPOSE_PATH = DEST_DIR + '/compose.yml'
+PS_PATH = DEST_DIR + '/postgres-scripts'
 
 def project_call(command):
+    print '#########################'
+    print command
     return subprocess.call(command, shell = True, cwd = PROJECT_PATH)
 
 def compose_command(command):
@@ -40,13 +42,17 @@ def set_key_url(config):
     environment[key_ind] = environment[key_ind].replace('localhost', get_machine_ip())
 
 def prepare():
-    project_call('./gradlew :riot-cloud:prepareCloudDockerFiles')
+    project_call('./gradlew clean --no-daemon')
+    project_call('./gradlew :riot-cloud:prepareCloudDockerFiles --no-daemon')
+    project_call('./gradlew :docker:riot-postgres-9.6:buildDockerImage --no-daemon')
+    project_call('./gradlew :docker:riot-cassandra:buildDockerImage --no-daemon')
+    project_call('./gradlew :riot-edge-node-application:buildDockerImage -PforceDockerBuildImages --no-daemon')
+    project_call('./gradlew :riot-cloud:buildDockerImage -PforceDockerBuildImages --no-daemon')
     config = get_config()
     if os.path.exists(PS_PATH):
         shutil.rmtree(PS_PATH)
     shutil.copytree(PROJECT_PATH + '/riot-cloud/build/docker-compose/postgres-scripts', PS_PATH)
     set_key_url(config)
-    # del config['services']['cloud']['network_mode']
     with file(COMPOSE_PATH, 'w') as compose:
         yaml.dump(config, compose, default_flow_style = False)
 
@@ -62,6 +68,7 @@ def pull_cloud():
 parser = argparse.ArgumentParser()
 parser.add_argument('--start', action = 'store_true', default = False)
 parser.add_argument('--prepare', action = 'store_true', default = False)
+parser.add_argument('--ui', action = 'store', default = False)
 parser.add_argument('--remove', action = 'store_true', default = False)
 parser.add_argument('--pull', action = 'store_true', default = False)
 args = parser.parse_args()
@@ -74,3 +81,7 @@ elif (args.prepare):
     prepare()
 elif (args.pull):
     pull_cloud()
+elif (not args.ui == None):
+    command = 'npm run ' + args.ui
+    print command
+    subprocess.call(command, shell = True, cwd = PROJECT_PATH + '/riot-ui')
