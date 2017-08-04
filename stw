@@ -6,20 +6,12 @@ import socket
 import subprocess
 import argparse
 import shutil
+from distutils import dir_util
 
 PROJECT_PATH = os.environ['HOME'] + '/projects/riot'
-DEST_DIR = os.environ['HOME'] + '/stw_tmp'
+DEST_DIR = os.environ['HOME'] + '/.stw_tmp'
 COMPOSE_PATH = DEST_DIR + '/compose.yml'
 PS_PATH = DEST_DIR + '/postgres-scripts'
-
-def mkdir_p(path):
-    try:
-        os.makedirs(path)
-    except OSError as exc:
-        if exc.errno == errno.EEXIST and os.path.isdir(path):
-            pass
-        else:
-            raise
 
 def project_call(command):
     print '#########################'
@@ -54,7 +46,7 @@ def set_key_url(config):
 def prepare_cloud():
     if not os.path.exists(DEST_DIR):
         print 'Creating folder for processed files ', DEST_DIR
-        mkdir_p(DEST_DIR)
+        dir_util.mkpath(DEST_DIR)
     project_call('./gradlew clean --no-daemon')
     project_call('./gradlew :riot-cloud:prepareCloudDockerFiles --no-daemon')
     project_call('./gradlew :docker:riot-postgres-9.6:buildDockerImage --no-daemon')
@@ -114,6 +106,14 @@ parser.add_argument(
     help = 'Pull images from registry',
     default = False
 )
+
+parser.add_argument(
+    '--clean',
+    action = 'store_true',
+    help = 'Clean your machine folders including images and temp folder',
+    default = False
+)
+
 args = parser.parse_args()
 
 try:
@@ -129,9 +129,14 @@ try:
         prepare_cloud()
     elif (args.pull):
         pull_cloud()
+    elif (args.clean):
+        compose_command('down -v')
+        if os.path.exists(DEST_DIR):
+            shutil.rmtree(DEST_DIR)
     elif (not args.ui == None):
         command = 'npm run ' + args.ui
         print command
         subprocess.call(command, shell = True, cwd = PROJECT_PATH + '/riot-ui')
-except:
+except Exception as e:
+    print e
     pass
