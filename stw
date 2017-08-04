@@ -8,13 +8,23 @@ import argparse
 import shutil
 
 PROJECT_PATH = os.environ['HOME'] + '/projects/riot'
-DEST_DIR = os.environ['HOME'] + '/temp'
+DEST_DIR = os.environ['HOME'] + '/stw_tmp'
 COMPOSE_PATH = DEST_DIR + '/compose.yml'
 PS_PATH = DEST_DIR + '/postgres-scripts'
+
+def mkdir_p(path):
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise
 
 def project_call(command):
     print '#########################'
     print command
+    print '#########################'
     return subprocess.call(command, shell = True, cwd = PROJECT_PATH)
 
 def compose_command(command):
@@ -41,7 +51,10 @@ def set_key_url(config):
     key_ind = index_of_first(environment, key_lambda)
     environment[key_ind] = environment[key_ind].replace('localhost', get_machine_ip())
 
-def prepare():
+def prepare_cloud():
+    if not os.path.exists(DEST_DIR):
+        print 'Creating folder for processed files ', DEST_DIR
+        mkdir_p(DEST_DIR)
     project_call('./gradlew clean --no-daemon')
     project_call('./gradlew :riot-cloud:prepareCloudDockerFiles --no-daemon')
     project_call('./gradlew :docker:riot-postgres-9.6:buildDockerImage --no-daemon')
@@ -66,20 +79,54 @@ def pull_cloud():
     compose_command('pull')
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--start', action = 'store_true', default = False)
-parser.add_argument('--prepare', action = 'store_true', default = False)
-parser.add_argument('--ui', action = 'store')
-parser.add_argument('--remove', action = 'store_true', default = False)
-parser.add_argument('--pull', action = 'store_true', default = False)
+parser.add_argument(
+    '--start',
+    action = 'store_true',
+    help = 'For starting cloud at the begining of day. combination of remove, prepare, up',
+    default = False
+)
+parser.add_argument(
+    '--up',
+    help = 'Up cloud env, ensure that at least one prepare was before',
+    action = 'store_true',
+    default = False
+)
+parser.add_argument(
+    '--prepare',
+    help = 'Make all preparation need to get docker-compose working(creates valid compose file from template)',
+    action = 'store_true',
+    default = False
+)
+parser.add_argument(
+    '--ui',
+    help = 'Runs command using npm run from UI directory',
+    action = 'store'
+)
+parser.add_argument(
+    '--remove',
+    help = 'Remove cloud containers',
+    action = 'store_true',
+    default = False
+)
+parser.add_argument(
+    '--pull',
+    action = 'store_true',
+    help = 'Pull images from registry',
+    default = False
+)
 args = parser.parse_args()
 
 try:
-    if (args.start):
+    if (args.up):
+        start_cloud()
+    elif (args.start):
+        remove_cloud()
+        prepare_cloud()
         start_cloud()
     elif (args.remove):
         remove_cloud()
     elif (args.prepare):
-        prepare()
+        prepare_cloud()
     elif (args.pull):
         pull_cloud()
     elif (not args.ui == None):
