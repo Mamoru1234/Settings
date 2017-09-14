@@ -84,8 +84,8 @@ parser.add_argument(
     default = False
 )
 parser.add_argument(
-    '--prepare',
-    help = 'Make all preparation need to get docker-compose working(creates valid compose file from template)',
+    '--build',
+    help = 'Build new images from sources',
     action = 'store_true',
     default = False
 )
@@ -95,7 +95,7 @@ parser.add_argument(
     action = 'store'
 )
 parser.add_argument(
-    '--remove',
+    '--down',
     help = 'Remove cloud containers',
     action = 'store_true',
     default = False
@@ -130,7 +130,7 @@ try:
     elif (args.pull):
         pull_cloud()
     elif (args.clean):
-        compose_command('down -v')
+        remove_cloud()
         if os.path.exists(DEST_DIR):
             shutil.rmtree(DEST_DIR)
     elif (not args.ui == None):
