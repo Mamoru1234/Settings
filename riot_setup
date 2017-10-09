@@ -2,6 +2,7 @@
 
 PROJECT_PATH=~/projects/riot
 DEST_DIR=~/.riot_tmp
+FOLDERS=('/postgres-scripts' '/mosquitto')
 
 GREEN="2;32"
 RED="0;31"
@@ -16,19 +17,24 @@ build_cloud() {
     mkdir -p $DEST_DIR
   fi
 
-  # ./gradlew clean --no-daemon
-  # ./gradlew :riot-cloud:prepareCloudDockerFiles --no-daemon
-  # ./gradlew :docker:riot-postgres-9.6:buildDockerImage --no-daemon
-  # ./gradlew :docker:riot-cassandra:buildDockerImage --no-daemon
-  # ./gradlew :riot-edge-node-application:buildDockerImage -PforceDockerBuildImages --no-daemon
-  # ./gradlew :riot-cloud:buildDockerImage -PforceDockerBuildImages --no-daemon
+  git pull -r
 
-  PG_FOLDER="./riot-cloud/build/docker-compose/postgres-scripts"
-  if [ ! -d "$PG_FOLDER" ]; then
-    color_echo $RED "postgres-scripts could not be found verify your build"
-    exit
-  fi
-  cp -rf $PG_FOLDER "$DEST_DIR/postgres-scripts"
+  ./gradlew clean --no-daemon
+  ./gradlew :riot-cloud:prepareCloudDockerFiles --no-daemon
+  ./gradlew :docker:riot-postgres-9.6:buildDockerImage --no-daemon
+  ./gradlew :docker:riot-cassandra:buildDockerImage --no-daemon
+  ./gradlew :riot-edge-node-application:buildDockerImage -PforceDockerBuildImages --no-daemon
+  ./gradlew :riot-cloud:buildDockerImage -PforceDockerBuildImages --no-daemon
+
+  for FOLDER_PREFIX in ${FOLDERS[@]}; do
+    ORIGIN_FOLDER="./riot-cloud/build/docker-compose$FOLDER_PREFIX"
+    if [ ! -d "$ORIGIN_FOLDER" ]; then
+      color_echo $RED "$FOLDER_PREFIX could not be found verify your build"
+      exit
+    fi
+    cp -rf $ORIGIN_FOLDER "$DEST_DIR$FOLDER_PREFIX"
+  done
+
 
   COMPOSE_PATH="./riot-cloud/build/docker-compose/riot-cloud-mac.yml"
   if [ ! -f "$COMPOSE_PATH" ]; then
