@@ -7,6 +7,7 @@ import subprocess
 import argparse
 import shutil
 from distutils import dir_util
+import sys
 
 PROJECT_PATH = os.environ['HOME'] + '/projects/riot'
 DEST_DIR = os.environ['HOME'] + '/.stw_tmp'
@@ -34,10 +35,17 @@ def get_machine_ip():
     return [(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
 
 def get_config():
-    config_path = PROJECT_PATH + '/riot-cloud/build/docker-compose/riot-cloud.yml'
+    config_path = PROJECT_PATH + '/riot-cloud/build/docker-compose/'
+    if sys.platform == 'linux2':
+        config_path = config_path + 'riot-cloud.yml'
+    elif sys.platform == 'darwin':
+        config_path = config_path + 'riot-cloud-mac.yml'
+    else:
+        print 'Unknown platform'
+        exit()
     if (not os.path.exists(config_path)):
         print 'Couldn\'t get docker-compose config'
-        exit();
+        exit()
     return yaml.load(file(config_path, 'r'))
 
 def clone_folders():
