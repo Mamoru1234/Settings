@@ -11,7 +11,7 @@ from distutils import dir_util
 PROJECT_PATH = os.environ['HOME'] + '/projects/riot'
 DEST_DIR = os.environ['HOME'] + '/.stw_tmp'
 COMPOSE_PATH = DEST_DIR + '/compose.yml'
-PS_PATH = DEST_DIR + '/postgres-scripts'
+COPY_FOLDERS = ['/postgres-scripts', '/mosquitto']
 
 def project_call(command):
     print '#########################'
@@ -40,14 +40,16 @@ def get_config():
         exit();
     return yaml.load(file(config_path, 'r'))
 
-def clone_ps_scripts():
-    origin_ps_scripts_path = PROJECT_PATH + '/riot-cloud/build/docker-compose/postgres-scripts'
-    if not os.path.exists(origin_ps_scripts_path):
-        print 'Couldn\'t get postgres-scripts folder'
-        exit();
-    if os.path.exists(PS_PATH):
-        shutil.rmtree(PS_PATH)
-    shutil.copytree(origin_ps_scripts_path, PS_PATH)
+def clone_folders():
+    for folder_prefix in COPY_FOLDERS:
+        origin_folder = PROJECT_PATH + '/riot-cloud/build/docker-compose' + folder_prefix
+        if not os.path.exists(origin_folder):
+            print 'Couldn\'t get' + folder_prefix + ' folder'
+            exit();
+        dest_path = DEST_DIR + folder_prefix
+        if os.path.exists(dest_path):
+            shutil.rmtree(dest_path)
+        shutil.copytree(origin_folder, dest_path)
 
 key_lambda = lambda x: 'KEYCLOAK_AUTH-SERVER-URL' in x
 
@@ -67,7 +69,7 @@ def prepare_cloud():
     project_call('./gradlew :riot-edge-node-application:buildDockerImage -PforceDockerBuildImages --no-daemon')
     project_call('./gradlew :riot-cloud:buildDockerImage -PforceDockerBuildImages --no-daemon')
     config = get_config()
-    clone_ps_scripts()
+    clone_folders()
     set_key_url(config)
     with file(COMPOSE_PATH, 'w') as compose:
         yaml.dump(config, compose, default_flow_style = False)
