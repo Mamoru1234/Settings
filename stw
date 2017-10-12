@@ -8,11 +8,19 @@ import argparse
 import shutil
 from distutils import dir_util
 import sys
+from tempfile import mkdtemp
 
-PROJECT_PATH = os.environ['HOME'] + '/projects/riot'
-DEST_DIR = os.environ['HOME'] + '/.stw_tmp'
+HOME = os.environ['HOME']
+
+PROJECT_PATH = HOME + '/projects/riot'
+DEST_DIR = HOME + '/.stw_tmp'
 COMPOSE_PATH = DEST_DIR + '/compose.yml'
 COPY_FOLDERS = ['/postgres-scripts', '/mosquitto']
+
+ATOM_SETTINGS_FILE = HOME + '/temp/settings.json'
+ATOM_IMAGE_VERSION = '2.0.0-rc.5'
+
+ATOM_IMAGE = 'registry.greenwavereality.com/axon/riot-atom:' + ATOM_IMAGE_VERSION
 
 def project_call(command):
     print '#########################'
@@ -72,15 +80,28 @@ def prepare_cloud():
         dir_util.mkpath(DEST_DIR)
     project_call('./gradlew clean --no-daemon')
     project_call('./gradlew :riot-cloud:prepareCloudDockerFiles --no-daemon')
-    project_call('./gradlew :docker:riot-postgres-9.6:buildDockerImage --no-daemon')
-    project_call('./gradlew :docker:riot-cassandra:buildDockerImage --no-daemon')
-    project_call('./gradlew :riot-edge-node-application:buildDockerImage -PforceDockerBuildImages --no-daemon')
-    project_call('./gradlew :riot-cloud:buildDockerImage -PforceDockerBuildImages --no-daemon')
+    project_call('./gradlew buildDockerImage --no-daemon')
+    os.system('docker pull ' + ATOM_IMAGE)
     config = get_config()
     clone_folders()
     set_key_url(config)
     with file(COMPOSE_PATH, 'w') as compose:
         yaml.dump(config, compose, default_flow_style = False)
+
+def run_atom():
+    if not os.path.exists(ATOM_SETTINGS_FILE):
+        print 'Couldn\'t find settings file'
+        exit()
+
+    settings_folder_path = mkdtemp(prefix = 'riot-')
+    shutil.copyfile(ATOM_SETTINGS_FILE, os.path.join(settings_folder_path, 'settings.json'))
+
+    command = "docker run --rm --network=riotcloud_default "
+    command = command + "-v "+ settings_folder_path+":/usr/local/riot-atom/etc/riot-atom "
+    command = command + ATOM_IMAGE + " -d"
+
+    os.system(command)
+    shutil.rmtree(settings_folder_path)
 
 def start_cloud():
     compose_command('up -d')
@@ -129,6 +150,13 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    '--atom',
+    action = 'store_true',
+    help = 'Run RIOT Atom',
+    default = False
+)
+
+parser.add_argument(
     '--clean',
     action = 'store_true',
     help = 'Clean your machine folders including images and temp folder',
@@ -154,6 +182,8 @@ try:
         prepare_cloud()
     elif (args.pull):
         pull_cloud()
+    elif (args.atom):
+        run_atom()
     elif (args.clean):
         remove_cloud()
         if os.path.exists(DEST_DIR):
