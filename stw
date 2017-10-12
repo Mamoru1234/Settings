@@ -88,13 +88,13 @@ def prepare_cloud():
     with file(COMPOSE_PATH, 'w') as compose:
         yaml.dump(config, compose, default_flow_style = False)
 
-def run_atom():
-    if not os.path.exists(DEFAULT_ATOM_SETTINGS_FILE):
-        print 'Couldn\'t find settings file'
+def run_atom(atom_settings_path):
+    if not os.path.exists(atom_settings_path):
+        print 'Couldn\'t find settings file: ' + atom_settings_path
         exit()
 
     settings_folder_path = mkdtemp(prefix = 'riot-')
-    shutil.copyfile(DEFAULT_ATOM_SETTINGS_FILE, os.path.join(settings_folder_path, 'settings.json'))
+    shutil.copyfile(atom_settings_path, os.path.join(settings_folder_path, 'settings.json'))
 
     command = "docker run --rm --network=riotcloud_default "
     command = command + "-v "+ settings_folder_path+":/usr/local/riot-atom/etc/riot-atom "
@@ -182,7 +182,7 @@ try:
     elif (args.pull):
         pull_cloud()
     elif (args.atom):
-        run_atom()
+        run_atom(args.atom)
     elif (args.clean):
         remove_cloud()
         if os.path.exists(DEST_DIR):
