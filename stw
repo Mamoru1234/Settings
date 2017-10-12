@@ -17,7 +17,7 @@ DEST_DIR = HOME + '/.stw_tmp'
 COMPOSE_PATH = DEST_DIR + '/compose.yml'
 COPY_FOLDERS = ['/postgres-scripts', '/mosquitto']
 
-ATOM_SETTINGS_FILE = HOME + '/temp/settings.json'
+DEFAULT_ATOM_SETTINGS_FILE = HOME + '/temp/settings.json'
 ATOM_IMAGE_VERSION = '2.0.0-rc.5'
 
 ATOM_IMAGE = 'registry.greenwavereality.com/axon/riot-atom:' + ATOM_IMAGE_VERSION
@@ -89,12 +89,12 @@ def prepare_cloud():
         yaml.dump(config, compose, default_flow_style = False)
 
 def run_atom():
-    if not os.path.exists(ATOM_SETTINGS_FILE):
+    if not os.path.exists(DEFAULT_ATOM_SETTINGS_FILE):
         print 'Couldn\'t find settings file'
         exit()
 
     settings_folder_path = mkdtemp(prefix = 'riot-')
-    shutil.copyfile(ATOM_SETTINGS_FILE, os.path.join(settings_folder_path, 'settings.json'))
+    shutil.copyfile(DEFAULT_ATOM_SETTINGS_FILE, os.path.join(settings_folder_path, 'settings.json'))
 
     command = "docker run --rm --network=riotcloud_default "
     command = command + "-v "+ settings_folder_path+":/usr/local/riot-atom/etc/riot-atom "
@@ -134,7 +134,6 @@ parser.add_argument(
 parser.add_argument(
     '--ui',
     help = 'Runs command using npm run from UI directory',
-    action = 'store'
 )
 parser.add_argument(
     '--down',
@@ -151,9 +150,9 @@ parser.add_argument(
 
 parser.add_argument(
     '--atom',
-    action = 'store_true',
     help = 'Run RIOT Atom',
-    default = False
+    nargs = '?',
+    const = DEFAULT_ATOM_SETTINGS_FILE
 )
 
 parser.add_argument(
