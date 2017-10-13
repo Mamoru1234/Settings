@@ -4,7 +4,9 @@ import yaml
 import os
 import socket
 import subprocess
+import json
 import argparse
+import uuid
 import shutil
 from distutils import dir_util
 import sys
@@ -88,13 +90,23 @@ def prepare_cloud():
     with file(COMPOSE_PATH, 'w') as compose:
         yaml.dump(config, compose, default_flow_style = False)
 
+def create_settings_file(settings_folder_path, atom_settings_path):
+    with open(atom_settings_path) as settings_file:
+        settings = json.load(settings_file)
+        if not settings.has_key('nodeId'):
+            settings['nodeId'] = str(uuid.uuid4())
+        if not settings['device'].has_key('deviceId'):
+            settings['device']['deviceId'] = str(uuid.uuid4())
+        with open(os.path.join(settings_folder_path, 'settings.json'), 'w') as output_settings_file:
+            json.dump(settings, output_settings_file)
+
 def run_atom(atom_settings_path):
     if not os.path.exists(atom_settings_path):
         print 'Couldn\'t find settings file: ' + atom_settings_path
         exit()
 
     settings_folder_path = mkdtemp(prefix = 'riot-')
-    shutil.copyfile(atom_settings_path, os.path.join(settings_folder_path, 'settings.json'))
+    create_settings_file(settings_folder_path, atom_settings_path)
 
     command = "docker run --rm --network=riotcloud_default "
     command = command + "-v "+ settings_folder_path+":/usr/local/riot-atom/etc/riot-atom "
