@@ -17,7 +17,11 @@ HOME = os.environ['HOME']
 PROJECT_PATH = HOME + '/projects/riot'
 DEST_DIR = HOME + '/.stw_tmp'
 COMPOSE_PATH = DEST_DIR + '/compose.yml'
-COPY_FOLDERS = ['/postgres-scripts', '/mosquitto']
+COPY_FOLDERS = [
+    '/postgres-scripts',
+    '/mosquitto',
+    '/keycloak'
+]
 
 DEFAULT_ATOM_SETTINGS_FILE = HOME + '/temp/settings.json'
 ATOM_IMAGE_VERSION = '2.0.0-rc.5'
