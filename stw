@@ -224,7 +224,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '--clean',
+    'clean',
     action = 'store_true',
     help = 'Clean your machine folders including images and temp folder',
     default = False
@@ -254,6 +254,7 @@ try:
     elif (args.clean):
         remove_cloud()
         if os.path.exists(DEST_DIR):
+            print 'Removing: ' + DEST_DIR
             shutil.rmtree(DEST_DIR)
     elif (not args.ui == None):
         command = 'npm run ' + args.ui
