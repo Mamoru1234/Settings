@@ -1,8 +1,0 @@
-#!/usr/bin/env bash
-
-function index() {
-    cat >> "index.js" <<EOF
-export {$1} from "./$1.js";
-
-EOF
-}
