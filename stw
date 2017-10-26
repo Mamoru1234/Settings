@@ -14,7 +14,13 @@ from tempfile import mkdtemp
 
 HOME = os.environ['HOME']
 
+#####                 User related properties
 PROJECT_PATH = HOME + '/projects/riot'
+DEFAULT_ATOM_SETTINGS_FILE = HOME + '/temp/config/settings.json'
+ATOM_IMAGE_VERSION = '2.0.0-rc.5'
+################################################
+
+#####                 Configuration
 DEST_DIR = HOME + '/.stw_tmp'
 COMPOSE_PATH = DEST_DIR + '/compose.yml'
 COPY_FOLDERS = [
@@ -22,11 +28,9 @@ COPY_FOLDERS = [
     '/mosquitto',
     '/keycloak'
 ]
-
-DEFAULT_ATOM_SETTINGS_FILE = HOME + '/temp/settings.json'
-ATOM_IMAGE_VERSION = '2.0.0-rc.5'
-
+CLOUD_NETWORK_NAME = 'riotcloud_riotcloudenv'
 ATOM_IMAGE = 'registry.greenwavereality.com/axon/riot-atom:' + ATOM_IMAGE_VERSION
+################################################
 
 def project_call(command):
     print '#########################'
@@ -34,8 +38,10 @@ def project_call(command):
     print '#########################'
     return subprocess.call(command, shell = True, cwd = PROJECT_PATH)
 
+COMPOSE_TEMPLATE = 'docker-compose -f ' + COMPOSE_PATH + ' -p riot-cloud {}'
+
 def compose_command(command):
-    st = 'docker-compose -f ' + COMPOSE_PATH + ' -p riot-cloud ' + command
+    st = COMPOSE_TEMPLATE.format(command)
     print st
     return subprocess.call(st, shell = True)
 
@@ -48,12 +54,14 @@ def index_of_first(lst, pred):
 def get_machine_ip():
     return [(s.connect(('8.8.8.8', 53)), s.getsockname()[0], s.close()) for s in [socket.socket(socket.AF_INET, socket.SOCK_DGRAM)]][0][1]
 
+BUILD_PATH_TEMPLATE = PROJECT_PATH + "/riot-cloud/build/docker-compose{}"
+
 def get_config():
-    config_path = PROJECT_PATH + '/riot-cloud/build/docker-compose/'
+    config_path = ''
     if sys.platform == 'linux2':
-        config_path = config_path + 'riot-cloud.yml'
+        config_path = BUILD_PATH_TEMPLATE.format('/riot-cloud.yml')
     elif sys.platform == 'darwin':
-        config_path = config_path + 'riot-cloud-mac.yml'
+        config_path = BUILD_PATH_TEMPLATE.format('riot-cloud-mac.yml')
     else:
         print 'Unknown platform'
         exit()
@@ -64,7 +72,7 @@ def get_config():
 
 def clone_folders():
     for folder_prefix in COPY_FOLDERS:
-        origin_folder = PROJECT_PATH + '/riot-cloud/build/docker-compose' + folder_prefix
+        origin_folder = BUILD_PATH_TEMPLATE.format(folder_prefix)
         if not os.path.exists(origin_folder):
             print 'Couldn\'t get' + folder_prefix + ' folder'
             exit();
@@ -104,6 +112,8 @@ def create_settings_file(settings_folder_path, atom_settings_path):
         with open(os.path.join(settings_folder_path, 'settings.json'), 'w') as output_settings_file:
             json.dump(settings, output_settings_file)
 
+RUN_ATOM_TEMPLATE="docker run --rm --network={} -v {}:/usr/local/riot-atom/etc/riot-atom {} -d"
+
 def run_atom(atom_settings_path):
     if not os.path.exists(atom_settings_path):
         print 'Couldn\'t find settings file: ' + atom_settings_path
@@ -111,10 +121,11 @@ def run_atom(atom_settings_path):
 
     settings_folder_path = mkdtemp(prefix = 'riot-')
     create_settings_file(settings_folder_path, atom_settings_path)
-
-    command = "docker run --rm --network=riotcloud_default "
-    command = command + "-v "+ settings_folder_path+":/usr/local/riot-atom/etc/riot-atom "
-    command = command + ATOM_IMAGE + " -d"
+    command = RUN_ATOM_TEMPLATE.format(
+        CLOUD_NETWORK_NAME,
+        settings_folder_path,
+        ATOM_IMAGE
+    )
 
     os.system(command)
     shutil.rmtree(settings_folder_path)
