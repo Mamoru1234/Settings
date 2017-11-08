@@ -109,7 +109,7 @@ def get_config():
     if sys.platform == 'linux2':
         config_path = BUILD_PATH_TEMPLATE.format('/riot-cloud.yml')
     elif sys.platform == 'darwin':
-        config_path = BUILD_PATH_TEMPLATE.format('riot-cloud-mac.yml')
+        config_path = BUILD_PATH_TEMPLATE.format('/riot-cloud-mac.yml')
     else:
         print 'Unknown platform'
         exit()
