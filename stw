@@ -136,7 +136,7 @@ def set_key_url(config):
     key_ind = index_of_first(environment, key_lambda)
     environment[key_ind] = environment[key_ind].replace('localhost', get_machine_ip())
 
-def setup_for_mac:
+def setup_for_mac():
     if sys.platform == 'darwin':
         sudoPassword = raw_input('Type password: ')
         command = 'ifconfig lo0 alias 172.16.250.1/24'
