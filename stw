@@ -21,8 +21,7 @@ CONFIG_FILE_PATH = DEST_DIR + '/settings.json'
 COMPOSE_PATH = DEST_DIR + '/compose.yml'
 COPY_FOLDERS = [
     '/postgres-scripts',
-    '/mosquitto',
-    '/keycloak'
+    '/mosquitto'
 ]
 CLOUD_NETWORK_NAME = 'riotcloud_riotcloudenv'
 ################################################
