@@ -24,6 +24,9 @@ COPY_FOLDERS = [
     '/mosquitto'
 ]
 CLOUD_NETWORK_NAME = 'riotcloud_riotcloudenv'
+JENKINS_URL = "http://monkey-02.greenwavereality.com:8080/view/Axon-Predict/job/axon-predict_build_release"
+ARTIFACT_PATH = "/lastBuild/artifact/riot-cloud/build/docker-compose/"
+ZIP_POSTFIX = "/*zip*/docker-compose.zip"
 ################################################
 
 def save_config():
@@ -35,7 +38,7 @@ def save_config():
     with open(CONFIG_FILE_PATH, 'w+') as config_file:
         json.dump(config, config_file)
 
-PROJECT_PATH_PROMPT = 'Enter path to project: '
+PROJECT_PATH_PROMPT = 'Enter path to project(enter to skip this step): '
 DEFAULT_ATOM_SETTINGS_FILE_PROMPT = 'Enter atom settings file path(enter if you are not planning use atom): '
 
 def setup_config():
@@ -47,7 +50,7 @@ def setup_config():
     print ''
 
     PROJECT_PATH = raw_input(PROJECT_PATH_PROMPT).replace('~', HOME)
-    while (not os.path.exists(PROJECT_PATH)):
+    while (DEFAULT_ATOM_SETTINGS_FILE != '' and not os.path.exists(PROJECT_PATH)):
         print 'Could not find project at: ' + PROJECT_PATH
         PROJECT_PATH = raw_input(PROJECT_PATH_PROMPT).replace('~', HOME)
     DEFAULT_ATOM_SETTINGS_FILE = raw_input(DEFAULT_ATOM_SETTINGS_FILE_PROMPT).replace('~', HOME)
@@ -103,12 +106,12 @@ def get_machine_ip():
 
 BUILD_PATH_TEMPLATE = PROJECT_PATH + "/riot-cloud/build/docker-compose{}"
 
-def get_config():
+def get_config(template=BUILD_PATH_TEMPLATE):
     config_path = ''
     if sys.platform == 'linux2':
-        config_path = BUILD_PATH_TEMPLATE.format('/riot-cloud.yml')
+        config_path = template.format('/riot-cloud.yml')
     elif sys.platform == 'darwin':
-        config_path = BUILD_PATH_TEMPLATE.format('/riot-cloud-mac.yml')
+        config_path = template.format('/riot-cloud-mac.yml')
     else:
         print 'Unknown platform'
         exit()
@@ -117,7 +120,7 @@ def get_config():
         exit()
     return yaml.load(file(config_path, 'r'))
 
-def clone_folders():
+def clone_folders(template=BUILD_PATH_TEMPLATE):
     for folder_prefix in COPY_FOLDERS:
         origin_folder = BUILD_PATH_TEMPLATE.format(folder_prefix)
         if not os.path.exists(origin_folder):
@@ -153,6 +156,26 @@ def prepare_cloud():
     set_key_url(config)
     with file(COMPOSE_PATH, 'w') as compose:
         yaml.dump(config, compose, default_flow_style = False)
+
+DOWNLOAD_PATH = DEST_DIR + "/docker-compose{}"
+
+def download_cloud():
+    setup_for_mac()
+    import urllib
+    import zipfile
+
+    ZIP_PATH = DEST_DIR + '/compose.zip'
+    urllib.urlretrieve (JENKINS_URL + ARTIFACT_PATH + ZIP_POSTFIX, ZIP_PATH)
+    with open(ZIP_PATH) as archive:
+        zip_archive = zipfile.ZipFile(archive)
+        zip_archive.extractall(DEST_DIR)
+        config = get_config(DOWNLOAD_PATH)
+        clone_folders(DOWNLOAD_PATH)
+        set_key_url(config)
+        with file(COMPOSE_PATH, 'w') as compose:
+            yaml.dump(config, compose, default_flow_style = False)
+        shutil.rmtree(DOWNLOAD_PATH.format(''))
+        os.remove(ZIP_PATH)
 
 def create_settings_file(settings_folder_path, atom_settings_path):
     with open(atom_settings_path) as settings_file:
@@ -219,9 +242,13 @@ parser.add_argument(
 parser.add_argument(
     '--pull',
     action = 'store_true',
-    help = 'Pull images from registry'
+    help = 'Pull sources from git'
 )
-
+parser.add_argument(
+    '--download',
+    action='store_true',
+    help='Download compose stuff from jenkins latest release'
+)
 parser.add_argument(
     '--atom',
     help = 'Run RIOT Atom',
@@ -256,6 +283,8 @@ try:
         pull_cloud()
     elif (args.atom):
         run_atom(args.atom)
+    elif (args.download):
+        download_cloud()
     elif (args.clean):
         remove_cloud()
         if os.path.exists(DEST_DIR):

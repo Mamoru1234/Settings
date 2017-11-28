@@ -22,3 +22,8 @@ Refer to `stw --help` for info.
 
 ## Note
 You need to setup some properties(like your project path), follow script tips for that.
+
+#### Use without sources
+  * stw --download -> Prepare files to start
+  * stw --up -> Start cloud
+  * stw --down  -> Remove cloud
