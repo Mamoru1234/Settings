@@ -8,7 +8,7 @@ stw - setup to work
 
 * Clone repository
  `git clone https://github.com/Mamoru1234/Settings.git`
-* install required lib `pip install PyYAML`
+* install required lib `pip install PyYAML` or `easy_install PyYAML`
 * Setup permissions
   * For Linux:
     `chmod +x stw`
