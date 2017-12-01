@@ -180,6 +180,7 @@ def download_cloud():
             yaml.dump(config, compose, default_flow_style = False)
         shutil.rmtree(DOWNLOAD_PATH.format(''))
         os.remove(ZIP_PATH)
+        compose_command('pull')
 
 def create_settings_file(settings_folder_path, atom_settings_path):
     with open(atom_settings_path) as settings_file:
