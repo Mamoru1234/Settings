@@ -18,10 +18,8 @@ HOME = os.environ['HOME']
 #####                 Configuration
 DEST_DIR = HOME + '/.stw_tmp'
 CONFIG_FILE_PATH = DEST_DIR + '/settings.json'
-COMPOSE_PATH = DEST_DIR + '/compose.yml'
+COMPOSE_PATH = 'compose.yml'
 COPY_FOLDERS = [
-    '/postgres-scripts',
-    '/mosquitto'
 ]
 CLOUD_NETWORK_NAME = 'riotcloud_riotcloudenv'
 JENKINS_URL = "http://monkey-02.greenwavereality.com:8080/view/Axon-Predict/job/axon-predict_build_release"
@@ -92,8 +90,9 @@ COMPOSE_TEMPLATE = 'docker-compose -f ' + COMPOSE_PATH + ' -p riot-cloud {}'
 
 def compose_command(command):
     st = COMPOSE_TEMPLATE.format(command)
+    os.environ['PUBLIC_HOST'] = get_machine_ip()
     print st
-    return subprocess.call(st, shell = True)
+    return subprocess.call(st, shell = True, cwd = DEST_DIR)
 
 def index_of_first(lst, pred):
     for i,v in enumerate(lst):
@@ -107,14 +106,7 @@ def get_machine_ip():
 BUILD_PATH_TEMPLATE = PROJECT_PATH + "/riot-cloud/build/docker-compose{}"
 
 def get_config(template=BUILD_PATH_TEMPLATE):
-    config_path = ''
-    if sys.platform == 'linux2':
-        config_path = template.format('/riot-cloud.yml')
-    elif sys.platform == 'darwin':
-        config_path = template.format('/riot-cloud-mac.yml')
-    else:
-        print 'Unknown platform'
-        exit()
+    config_path = template.format('/docker-compose-public.yml')
     if (not os.path.exists(config_path)):
         print 'Couldn\'t get docker-compose config'
         exit()
@@ -149,15 +141,13 @@ def prepare_cloud():
         print 'Couldn\'t find project in ' + PROJECT_PATH
         exit()
 
-    setup_for_mac()
-    project_call('./gradlew clean --no-daemon')
-    project_call('./gradlew :riot-cloud:prepareCloudDockerFiles --no-daemon')
-    project_call('./gradlew buildDockerImage --no-daemon')
+    # project_call('./gradlew clean --no-daemon')
+    # project_call('./gradlew :riot-cloud:prepareCloudDockerFiles --no-daemon')
+    # project_call('./gradlew buildDockerImage --no-daemon')
+    shutil.copy2(BUILD_PATH_TEMPLATE.format('/.env'), DEST_DIR)
     if (ATOM_IMAGE_VERSION != ''):
         os.system('docker pull ' + ATOM_IMAGE)
     config = get_config()
-    clone_folders()
-    set_key_url(config)
     with file(COMPOSE_PATH, 'w') as compose:
         yaml.dump(config, compose, default_flow_style = False)
 
