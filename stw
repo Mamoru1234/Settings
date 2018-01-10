@@ -141,12 +141,15 @@ def prepare_cloud():
         print 'Couldn\'t find project in ' + PROJECT_PATH
         exit()
 
-    # project_call('./gradlew clean --no-daemon')
-    # project_call('./gradlew :riot-cloud:prepareCloudDockerFiles --no-daemon')
-    # project_call('./gradlew buildDockerImage --no-daemon')
+    project_call('./gradlew clean --no-daemon')
+    project_call('./gradlew :riot-cloud:prepareCloudDockerFiles --no-daemon')
+    project_call('./gradlew buildDockerImage --no-daemon')
+
     shutil.copy2(BUILD_PATH_TEMPLATE.format('/.env'), DEST_DIR)
+
     if (ATOM_IMAGE_VERSION != ''):
         os.system('docker pull ' + ATOM_IMAGE)
+
     config = get_config()
     with file(COMPOSE_PATH, 'w') as compose:
         yaml.dump(config, compose, default_flow_style = False)
