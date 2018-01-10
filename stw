@@ -18,7 +18,7 @@ HOME = os.environ['HOME']
 #####                 Configuration
 DEST_DIR = HOME + '/.stw_tmp'
 CONFIG_FILE_PATH = DEST_DIR + '/settings.json'
-COMPOSE_PATH = 'compose.yml'
+COMPOSE_PATH = DEST_DIR + '/docker-compose.yml'
 COPY_FOLDERS = [
 ]
 CLOUD_NETWORK_NAME = 'riotcloud_riotcloudenv'
@@ -86,11 +86,13 @@ def project_call(command):
     print '#########################'
     return subprocess.call(command, shell = True, cwd = PROJECT_PATH)
 
-COMPOSE_TEMPLATE = 'docker-compose -f ' + COMPOSE_PATH + ' -p riot-cloud {}'
+COMPOSE_TEMPLATE = 'docker-compose -p riot-cloud {}'
 
 def compose_command(command):
     st = COMPOSE_TEMPLATE.format(command)
-    os.environ['PUBLIC_HOST'] = get_machine_ip()
+    machine_ip = get_machine_ip()
+    os.environ['PUBLIC_HOST'] = machine_ip
+    print 'Using IP: ', machine_ip
     print st
     return subprocess.call(st, shell = True, cwd = DEST_DIR)
 
