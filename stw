@@ -169,8 +169,7 @@ def download_cloud():
         zip_archive = zipfile.ZipFile(archive)
         zip_archive.extractall(DEST_DIR)
         config = get_config(DOWNLOAD_PATH)
-        clone_folders(DOWNLOAD_PATH)
-        set_key_url(config)
+        shutil.copy2(DOWNLOAD_PATH.format('/.env'), DEST_DIR)
         with file(COMPOSE_PATH, 'w') as compose:
             yaml.dump(config, compose, default_flow_style = False)
         shutil.rmtree(DOWNLOAD_PATH.format(''))
