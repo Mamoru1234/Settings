@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+echo "Settuping git repo to use $1 as ssh key"
+git config core.sshCommand "ssh -i $1 -F /dev/null"
+

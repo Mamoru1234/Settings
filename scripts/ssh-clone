@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+echo "git clone using sshkey: $1 of project: $2"
+ssh-agent bash -c "ssh-add $1; git clone $2"
+
