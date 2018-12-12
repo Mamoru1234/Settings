@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+
+echo "Sync scripts forlder with ~/bin"
+mkdir -p ~/bin
+cp -v ./scripts/* ~/bin
