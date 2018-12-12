@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
 
 echo "Generating changelog..."
+echo "-----------------------"
 
+git log $1...$2  --pretty=format:"%s"
+
+echo "-----------------------"
