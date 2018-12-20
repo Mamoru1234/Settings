@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+const ngrok = require('ngrok');
+
+async function main() {
+	return await ngrok.connect(8080);
+}
+main()
+	.then((url) => {
+		console.log('Done: ', url);
+	})
+	.catch((e) => {
+		console.log('Error: ', e);
+	});
