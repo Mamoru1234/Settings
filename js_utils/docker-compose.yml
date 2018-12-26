@@ -1,0 +1,9 @@
+---
+version: "3"
+services:
+  proxy:
+    image: "nginx:1.15-alpine"
+    ports:
+      - "5987:80"
+    volumes:
+      - ./proxy.conf:/etc/nginx/conf.d/default.conf:ro
