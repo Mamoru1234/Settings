@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+
+java -jar "$STW_PROJECT_PATH/stw/build/libs/stw-0.1.0-SNAPSHOT-exec.jar" $@
