@@ -5,8 +5,8 @@ import { createArchive, extractFile } from './zip-utils';
 import { createCipheriv, createDecipheriv, scrypt } from 'crypto';
 import { pipelineAsync } from './app-utils';
 import { createReadStream, createWriteStream } from 'fs';
+import { readLine } from './read-line-utils';
 
-const PASSWORD = '123';
 const SALT = 'SALT';
 const ALGORITHM = 'AES-256-CBC';
 const KEY_SIZE = 32;
@@ -37,7 +37,8 @@ export async function encryptDir(from: string, to: string): Promise<void> {
   const taskDir = await mkdtemp(join(tmpdir(), 'encrypted-fs-'));
   await createArchive(from, join(taskDir, 'data.zip'));
   const iv = Buffer.alloc(IV_SIZE);
-  const key = await scryptAsync(PASSWORD, Buffer.from(SALT), KEY_SIZE);
+  const password = (await readLine('Enter password: ')).trim();
+  const key = await scryptAsync(password, Buffer.from(SALT), KEY_SIZE);
   const cipher = createCipheriv(ALGORITHM, key, iv);
   const base = basename(from);
   const resultName = `${base}.zip`;
@@ -47,7 +48,6 @@ export async function encryptDir(from: string, to: string): Promise<void> {
 }
 
 //node build/dist/main.js decrypt ~/temp/pet.zip ~/temp/pet
-
 export async function decryptDir(from: string, to: string): Promise<void> {
   if (! await pathExists(from)) {
     throw new Error(`Path do not exists: ${from}`);
@@ -58,9 +58,14 @@ export async function decryptDir(from: string, to: string): Promise<void> {
   }
   const taskDir = await mkdtemp(join(tmpdir(), 'encrypted-fs-'));
   const iv = Buffer.alloc(IV_SIZE);
-  const key = await scryptAsync(PASSWORD, Buffer.from(SALT), KEY_SIZE);
+  const password = (await readLine('Enter password: ')).trim();
+  const key = await scryptAsync(password, Buffer.from(SALT), KEY_SIZE);
   const decipher = createDecipheriv(ALGORITHM, key, iv);
   await pipelineAsync(createReadStream(from), decipher, createWriteStream(join(taskDir, 'data.zip')));
   await extractFile(join(taskDir, 'data.zip'), to);
   await remove(taskDir);
+  const response = await readLine('Press enter when finish review ');
+  if (response !== 'keep') {
+    await remove(to);
+  }
 }
