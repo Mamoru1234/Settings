@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -eu;
+
+SOURCE_PATH=$1
+CONTAINER_NAME=$2;
+DESTINATION_PATH=$3;
+
+docker exec -it "$CONTAINER_NAME" bash -c "mkdir -p $DESTINATION_PATH"
+docker cp "$SOURCE_PATH" "$CONTAINER_NAME:$DESTINATION_PATH"
