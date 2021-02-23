@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
-    <xs:element name="Report">
-        <xs:annotation>
-            <xs:documentation>Statutory Report for Gaming Activities in Georgia. This Report has to be submitted by B2C operators on a daily basis</xs:documentation>
-        </xs:annotation>
-        <xs:complexType>
-            <xs:sequence>
-                <xs:element name="B2BSmryGmAcct" type="xs:string" maxOccurs="unbounded"/>
-            </xs:sequence>
-        </xs:complexType>
-    </xs:element>
+<xs:schema
+        xmlns:xs="http://www.w3.org/2001/XMLSchema"
+        xmlns="rsg"
+        targetNamespace="rsg"
+        elementFormDefault="qualified"
+        attributeFormDefault="unqualified">
+    <xs:element name="Report" type="xs:string"/>
 </xs:schema>
